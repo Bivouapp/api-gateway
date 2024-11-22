@@ -28,12 +28,12 @@ public class GatewayConfig {
 
     @RequestMapping(value = "/disponibilities/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Object> forwardToDisponibilities(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
-        return forwardToMicroservice(disponibilitiesServiceUrl, headers, body, method, request);
+        return forwardToMicroservice(reservationServiceUrl, headers, body, method, request);
     }
 
     @RequestMapping(value = "/reviews/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Object> forwardToReviews(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
-        return forwardToMicroservice(reviewsServiceUrl, headers, body, method, request);
+        return forwardToMicroservice(reservationServiceUrl, headers, body, method, request);
     }
 
     private ResponseEntity<Object> forwardToMicroservice(String baseUrl, Map<String, String> headers, Object body, HttpMethod method, HttpServletRequest request) {
