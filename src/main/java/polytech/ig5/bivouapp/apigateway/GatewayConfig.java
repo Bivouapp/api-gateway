@@ -17,12 +17,6 @@ public class GatewayConfig {
     @Value("${microservices.reservation}")
     private String reservationServiceUrl;
 
-    @Value("${microservices.disponibilities}")
-    private String disponibilitiesServiceUrl;
-
-    @Value("${microservices.reviews}")
-    private String reviewsServiceUrl;
-
     public GatewayConfig(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
