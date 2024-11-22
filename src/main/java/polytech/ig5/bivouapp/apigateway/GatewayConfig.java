@@ -17,6 +17,15 @@ public class GatewayConfig {
     @Value("${microservices.reservation}")
     private String reservationServiceUrl;
 
+    @Value("${microservices.bivouac}")
+    private String bivouacServiceUrl;
+
+    @Value("${microservices.user}")
+    private String userServiceUrl;
+
+    @Value("${microservices.address}")
+    private String addressServiceUrl;
+
     public GatewayConfig(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
@@ -34,6 +43,26 @@ public class GatewayConfig {
     @RequestMapping(value = "/reviews/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Object> forwardToReviews(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
         return forwardToMicroservice(reservationServiceUrl, headers, body, method, request);
+    }
+
+    @RequestMapping(value = "/bivouacs/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToBivouacs(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(bivouacServiceUrl, headers, body, method, request);
+    }
+
+    @RequestMapping(value = "/equipments/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToEquipments(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(bivouacServiceUrl, headers, body, method, request);
+    }
+    
+    @RequestMapping(value = "/users/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToUsers(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(userServiceUrl, headers, body, method, request);
+    }
+
+    @RequestMapping(value = "/addresses/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToAddresses(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(addressServiceUrl, headers, body, method, request);
     }
 
     private ResponseEntity<Object> forwardToMicroservice(String baseUrl, Map<String, String> headers, Object body, HttpMethod method, HttpServletRequest request) {
