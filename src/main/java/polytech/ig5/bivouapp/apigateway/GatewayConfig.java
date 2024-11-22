@@ -28,38 +28,23 @@ public class GatewayConfig {
     }
 
     @RequestMapping(value = "/reservations/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<Object> forwardToReservations(@RequestHeader Map<String, String> headers, 
-                                                         @RequestBody(required = false) Object body, 
-                                                         HttpMethod method, 
-                                                         HttpServletRequest request) {
+    public ResponseEntity<Object> forwardToReservations(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
         return forwardToMicroservice(reservationServiceUrl, headers, body, method, request);
     }
 
     @RequestMapping(value = "/disponibilities/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<Object> forwardToDisponibilities(@RequestHeader Map<String, String> headers, 
-                                                            @RequestBody(required = false) Object body, 
-                                                            HttpMethod method, 
-                                                            HttpServletRequest request) {
+    public ResponseEntity<Object> forwardToDisponibilities(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
         return forwardToMicroservice(disponibilitiesServiceUrl, headers, body, method, request);
     }
 
     @RequestMapping(value = "/reviews/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
-    public ResponseEntity<Object> forwardToReviews(@RequestHeader Map<String, String> headers, 
-                                                    @RequestBody(required = false) Object body, 
-                                                    HttpMethod method, 
-                                                    HttpServletRequest request) {
+    public ResponseEntity<Object> forwardToReviews(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
         return forwardToMicroservice(reviewsServiceUrl, headers, body, method, request);
     }
 
-    private ResponseEntity<Object> forwardToMicroservice(String baseUrl, 
-                                                          Map<String, String> headers, 
-                                                          Object body, 
-                                                          HttpMethod method, 
-                                                          HttpServletRequest request) {
+    private ResponseEntity<Object> forwardToMicroservice(String baseUrl, Map<String, String> headers, Object body, HttpMethod method, HttpServletRequest request) {
         // Extract the remaining path from the request URI
         String requestUri = request.getRequestURI(); // Full URI after the base path
-        // String basePath = "/api/v1"; // Gateway's base path
-        // String relativePath = requestUri.replaceFirst(basePath, ""); // Remove the base path
 
         // Remove the slash at the end of the requestUri if it exists
         if (requestUri.endsWith("/")) {
@@ -74,8 +59,6 @@ public class GatewayConfig {
         // Configure the request headers
         HttpHeaders httpHeaders = new HttpHeaders();
         headers.forEach(httpHeaders::add);
-        // Force non-gzipped response
-        // httpHeaders.add("Accept-Encoding", "identity");
 
         HttpEntity<Object> entity = new HttpEntity<>(body, httpHeaders);
 
@@ -94,12 +77,12 @@ public class GatewayConfig {
     
             // Return response with updated headers
             return ResponseEntity.status(response.getStatusCode())
-                    .headers(responseHeaders)
-                    .body(response.getBody());
+                .headers(responseHeaders)
+                .body(response.getBody());
         } catch (Exception e) {
             System.err.println("Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error forwarding request: " + e.getMessage());
+                .body("Error forwarding request: " + e.getMessage());
         }
     }
 }
