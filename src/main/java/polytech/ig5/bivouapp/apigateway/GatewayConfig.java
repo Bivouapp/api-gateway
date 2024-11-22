@@ -74,16 +74,32 @@ public class GatewayConfig {
         // Configure the request headers
         HttpHeaders httpHeaders = new HttpHeaders();
         headers.forEach(httpHeaders::add);
+        // Force non-gzipped response
+        // httpHeaders.add("Accept-Encoding", "identity");
 
         HttpEntity<Object> entity = new HttpEntity<>(body, httpHeaders);
 
-        // Forward the request
-        ResponseEntity<Object> response = restTemplate.exchange("http://ms-reservation.cluster-ig5.igpolytech.fr:8080/api/v1/reservations/", method, entity, Object.class);
-
-        System.out.println("Raw Response Body: " + response.getBody());
-        System.out.println("Raw Response Headers: " + response.getHeaders());
-        System.out.println("Raw Response Status Code: " + response.getStatusCode());
-
-        return response;
+        try {
+            // Call the microservice
+            ResponseEntity<byte[]> response = restTemplate.exchange(fullUrl, method, entity, byte[].class);
+    
+            // Log response details
+            System.out.println("Response Headers: " + response.getHeaders());
+            System.out.println("Response Status Code: " + response.getStatusCode());
+    
+            // Set Content-Encoding header to gzip (if applicable)
+            HttpHeaders responseHeaders = new HttpHeaders();
+            responseHeaders.putAll(response.getHeaders());
+            responseHeaders.set("Content-Encoding", "gzip");
+    
+            // Return response with updated headers
+            return ResponseEntity.status(response.getStatusCode())
+                    .headers(responseHeaders)
+                    .body(response.getBody());
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error forwarding request: " + e.getMessage());
+        }
     }
 }
