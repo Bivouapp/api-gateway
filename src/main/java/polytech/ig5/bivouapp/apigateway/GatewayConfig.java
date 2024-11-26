@@ -59,8 +59,18 @@ public class GatewayConfig {
         return forwardToMicroservice(bivouacServiceUrl, headers, body, method, request);
     }
 
+    @RequestMapping(value = "/bivouac-equipment/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToBivouacEquipments(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(bivouacServiceUrl, headers, body, method, request);
+    }
+
     @RequestMapping(value = "/users/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
     public ResponseEntity<Object> forwardToUsers(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
+        return forwardToMicroservice(userServiceUrl, headers, body, method, request);
+    }
+
+    @RequestMapping(value = "/favourites/**", method = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+    public ResponseEntity<Object> forwardToFavourites(@RequestHeader Map<String, String> headers, @RequestBody(required = false) Object body, HttpMethod method, HttpServletRequest request) {
         return forwardToMicroservice(userServiceUrl, headers, body, method, request);
     }
 
