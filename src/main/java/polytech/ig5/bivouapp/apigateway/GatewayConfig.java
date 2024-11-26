@@ -7,12 +7,15 @@ import org.springframework.web.client.RestTemplate;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.nio.charset.StandardCharsets;
 
 @RestController
 @RequestMapping("/api")
 public class GatewayConfig {
 
     private final RestTemplate restTemplate;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Value("${microservices.reservation}")
     private String reservationServiceUrl;
@@ -77,13 +80,39 @@ public class GatewayConfig {
         // Construct the full URL to the microservice
         String fullUrl = baseUrl + requestUri;
 
-        System.out.println("Full URL: " + fullUrl);
-
         // Configure the request headers
         HttpHeaders httpHeaders = new HttpHeaders();
         headers.forEach(httpHeaders::add);
 
-        HttpEntity<Object> entity = new HttpEntity<>(body, httpHeaders);
+        // Ensure Content-Type is set to JSON for POST/PUT requests
+        if (method == HttpMethod.POST || method == HttpMethod.PUT) {
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+        }
+
+        // Remove Content-Encoding header if present
+        httpHeaders.remove("Content-Encoding");
+
+        String jsonBody = null;
+        try {
+            if (body != null) {
+                // Serialize the body to JSON
+                jsonBody = objectMapper.writeValueAsString(body);
+                System.out.println("Serialized JSON Body: " + jsonBody);
+            }
+        } catch (Exception e) {
+            System.err.println("Error serializing request body: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error serializing request body: " + e.getMessage());
+        }
+
+        httpHeaders.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
+
+        HttpEntity<Object> entity = new HttpEntity<>(jsonBody, httpHeaders);
+
+        System.out.println("Sending request to: " + fullUrl);
+        System.out.println("Request Headers: " + httpHeaders);
+        System.out.println("Request Body: " + jsonBody);
+        System.out.println("Entity: " + entity);
 
         try {
             // Call the microservice
@@ -96,7 +125,8 @@ public class GatewayConfig {
             // Set Content-Encoding header to gzip (if applicable)
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.putAll(response.getHeaders());
-            responseHeaders.set("Content-Encoding", "gzip");
+            // responseHeaders.set("Content-Encoding", "gzip");
+            responseHeaders.remove("Content-Encoding");
     
             // Return response with updated headers
             return ResponseEntity.status(response.getStatusCode())
