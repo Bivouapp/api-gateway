@@ -105,7 +105,9 @@ public class GatewayConfig {
                     .body("Error serializing request body: " + e.getMessage());
         }
 
-        httpHeaders.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
+        if (jsonBody != null) {
+            httpHeaders.setContentLength(jsonBody.getBytes(StandardCharsets.UTF_8).length);
+        }
 
         HttpEntity<Object> entity = new HttpEntity<>(jsonBody, httpHeaders);
 
@@ -125,8 +127,6 @@ public class GatewayConfig {
             // Set Content-Encoding header to gzip (if applicable)
             HttpHeaders responseHeaders = new HttpHeaders();
             responseHeaders.putAll(response.getHeaders());
-            // responseHeaders.set("Content-Encoding", "gzip");
-            responseHeaders.remove("Content-Encoding");
     
             // Return response with updated headers
             return ResponseEntity.status(response.getStatusCode())
